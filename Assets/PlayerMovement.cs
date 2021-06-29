@@ -21,6 +21,7 @@ public class PlayerMovement : MonoBehaviour
     private GameObject grappled_to;
     private float sphereRadius = 2f;
     private SpringJoint2D joint;
+    public float start_time;
 
     // Start is called before the first frame update
     void Start()
@@ -35,7 +36,10 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
         {
             if(launcher.transform.position != end_of_launcher.position)
+            {
                 launch = true;
+                start_time = Time.time;
+            }
         }
 
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -61,6 +65,8 @@ public class PlayerMovement : MonoBehaviour
                 joint.connectedAnchor = grappled_to.transform.position;
 
                 joint.distance = Vector2.Distance(player.transform.position, grappled_to.transform.position);
+
+                joint.enableCollision = true;
 
                 joint.dampingRatio = 0f;
                 joint.frequency = 10;
@@ -112,5 +118,6 @@ public class PlayerMovement : MonoBehaviour
     public void reset()
     {
         grappled_to = null;
+        draw_line = false;
     }
 }
