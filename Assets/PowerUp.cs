@@ -14,6 +14,9 @@ public class PowerUp : MonoBehaviour
     void OnTriggerEnter2D(Collider2D col)
     {
         pm.AddBoost();
-        Destroy(pu);
+        ParticleSystem ps = pu.GetComponentInChildren<ParticleSystem>();
+        ps.Play();
+        pu.GetComponent<SpriteRenderer>().enabled = false;
+        pu.GetComponent<CircleCollider2D>().enabled = false;
     }
 }

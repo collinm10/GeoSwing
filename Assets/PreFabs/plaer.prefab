@@ -2074,6 +2074,7 @@ MonoBehaviour:
   grapple_strength: 3
   lc: {fileID: 0}
   bb1: {fileID: 7505487462607787717}
+  z_offset: -2
   total_launch_force: 1500
   start_time: 0
 --- !u!120 &5416607922068994127
@@ -2504,7 +2505,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2522984600619584714, guid: 76350920aaf553b4ca08359e9fd2b84a, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 76350920aaf553b4ca08359e9fd2b84a, type: 3}

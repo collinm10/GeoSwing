@@ -8,7 +8,7 @@ public static class SaveSystem
     {
         BinaryFormatter formatter = new BinaryFormatter();
 
-        string path = Application.persistentDataPath + "/customizer.dat";
+        string path = Application.persistentDataPath + "/customizer1.dat";
         FileStream stream = new FileStream(path, FileMode.Create);
 
         formatter.Serialize(stream, customizer);
@@ -18,7 +18,7 @@ public static class SaveSystem
 
     public static Customizer LoadCustomizer()
     {
-        string path = Application.persistentDataPath + "/customizer.dat";
+        string path = Application.persistentDataPath + "/customizer1.dat";
         if (File.Exists(path))
         {
             BinaryFormatter formatter = new BinaryFormatter();

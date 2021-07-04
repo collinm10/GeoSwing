@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class CustomizeManager : MonoBehaviour
 {
+    public GameObject main_menu_plaer;
+    public GameObject main_menu_obstacle;
+
     public Transform skin_location;
 
     public int num_player_skins;
@@ -29,8 +32,8 @@ public class CustomizeManager : MonoBehaviour
     public GameObject[] rope_skin_demos;
 
     [Header("Scroll Buttons")]
-    public Button button1;
-    public Button button2;
+    public GameObject button1;
+    public GameObject button2;
 
     //skin arrays
     private Skin[] player_skins;
@@ -40,39 +43,63 @@ public class CustomizeManager : MonoBehaviour
     private GameObject[] active_demos;
     private int highlighted_index;
 
+    private int type;
+
+    private GameObject BuyOrEquip;
+    public Text BuyOrEquipText;
+    public GameObject BuyPanel;
+    public Text NumPlayerCoins;
+    private Customizer customizer;
+
     void Awake()
     {
-        //Initialize skin arrays
-        player_skins = new Skin[num_player_skins];
-        obstacle_skins = new Skin[num_obstacle_skins];
-        rope_skins = new Skin[num_rope_skins];
-
-        //Create player skins
-        for(int i = 0; i < num_player_skins; i++)
+        customizer = SaveSystem.LoadCustomizer();
+        if (customizer == null)
         {
-            player_skins[i] = new Skin(player_sprite_names[i], player_material_names[i], 2);
+            customizer = new Customizer(obstacle_skin_demos.Length, rope_skin_demos.Length, player_skin_demos.Length);
         }
 
-        //Create obstacle skins
-        for (int i = 0; i < num_obstacle_skins; i++)
-        {
-            obstacle_skins[i] = new Skin(obstacle_sprite_names[i], obstacle_material_names[i], 0);
-        }
+        main_menu_plaer.GetComponent<MainMenuAnimation>().update_skins(customizer.GetActiveSkin(2), 2);
+        main_menu_obstacle.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForObstacles/ObstacleSkin" + customizer.GetActiveSkin(0));
 
-        //Create rope skins
-        for (int i = 0; i < num_rope_skins; i++)
-        {
-            rope_skins[i] = new Skin(rope_sprite_names[i], rope_material_names[i], 1);
-        }
+        BuyOrEquip = GameObject.Find("BuyOrEquip");
     }
 
-    public void customization_clicked(int type)
+    public void customization_clicked(int type1)
     {
-        switch (type)
+        int numCoins = PlayerPrefs.GetInt("Coins", 0);
+        NumPlayerCoins.text = numCoins.ToString();
+
+        button1.SetActive(true);
+        button2.SetActive(true);
+
+        switch (type1)
         {
             case 0:
+                active_demos = new GameObject[num_obstacle_skins];
+                for (int i = 0; i < num_obstacle_skins; i++)
+                {
+                    highlighted_index = 0;
+
+                    Vector3 pos;
+                    if (i < 2)
+                        pos = new Vector3(skin_location.position.x + i * 3.5f, skin_location.position.y, skin_location.position.z);
+                    else
+                        pos = new Vector3(skin_location.position.x + i * 30f, skin_location.position.y, skin_location.position.z);
+
+                    active_demos[i] = Instantiate(obstacle_skin_demos[i], pos, skin_location.rotation);
+
+
+                    if (active_demos[i].transform.position != skin_location.position)
+                    {
+                        dehighlight(i);
+                    }
+                }
+                button1.SetActive(false);
+                type = 0;
                 break;
             case 1:
+                type = 1;
                 break;
             case 2:
                 active_demos = new GameObject[num_player_skins];
@@ -81,7 +108,7 @@ public class CustomizeManager : MonoBehaviour
                     highlighted_index = 0;
 
                     Vector3 pos;
-                    if(i < 2)
+                    if (i < 2)
                         pos = new Vector3(skin_location.position.x + i * 3.5f, skin_location.position.y, skin_location.position.z);
                     else
                         pos = new Vector3(skin_location.position.x + i * 30f, skin_location.position.y, skin_location.position.z);
@@ -89,19 +116,21 @@ public class CustomizeManager : MonoBehaviour
                     active_demos[i] = Instantiate(player_skin_demos[i], pos, skin_location.rotation);
 
 
-                    if(active_demos[i].transform.position != skin_location.position)
+                    if (active_demos[i].transform.position != skin_location.position)
                     {
                         dehighlight(i);
                     }
                 }
-                button1.interactable = false;
+                button1.SetActive(false);
+                type = 2;
                 break;
         }
+        change_button();
     }
 
     public void scroll_right()
     {
-        button1.interactable = true;
+        button1.SetActive(true);
 
         if (highlighted_index != 0)
         {
@@ -114,44 +143,47 @@ public class CustomizeManager : MonoBehaviour
         active_demos[highlighted_index + 1].transform.position = skin_location.position;
         highlight(highlighted_index + 1);
 
-        if(highlighted_index < active_demos.Length - 2)
+        if (highlighted_index < active_demos.Length - 2)
             active_demos[highlighted_index + 2].transform.position = new Vector3(skin_location.position.x + 3.5f, skin_location.position.y, skin_location.position.z);
 
         highlighted_index++;
 
-        print(highlighted_index);
-        print(active_demos.Length - 1);
-
-        if(highlighted_index == active_demos.Length - 1)
+        if (highlighted_index == active_demos.Length - 1)
         {
-            button2.interactable = false;
+            button2.SetActive(false);
+            button1.SetActive(true);
         }
+
+        change_button();
     }
 
     public void scroll_left()
     {
-        button2.interactable = true;
+        button2.SetActive(true);
 
         active_demos[highlighted_index].transform.position = new Vector3(skin_location.position.x + 3.5f, skin_location.position.y, skin_location.position.z);
         dehighlight(highlighted_index);
 
-        if(highlighted_index  < active_demos.Length - 1)
+        if (highlighted_index < active_demos.Length - 1)
             active_demos[highlighted_index + 1].transform.position = new Vector3(skin_location.position.x + 30f, skin_location.position.y, skin_location.position.z);
 
         active_demos[highlighted_index - 1].transform.position = skin_location.position;
         highlight(highlighted_index - 1);
 
-        if(highlighted_index > 1)
+        if (highlighted_index > 1)
         {
             active_demos[highlighted_index - 2].transform.position = new Vector3(skin_location.position.x - 3.5f, skin_location.position.y, skin_location.position.z);
         }
 
         highlighted_index--;
-        
-        if(highlighted_index == 0)
+
+        if (highlighted_index == 0)
         {
-            button1.interactable = false;
+            button1.SetActive(false);
+            button2.SetActive(true);
         }
+
+        change_button();
     }
 
     private void dehighlight(int i)
@@ -160,7 +192,7 @@ public class CustomizeManager : MonoBehaviour
         Color curr = active_demos[i].GetComponent<SpriteRenderer>().color;
         active_demos[i].GetComponent<SpriteRenderer>().color = new Color(curr.r, curr.g, curr.b, .5f);
     }
-    
+
     private void highlight(int i)
     {
         active_demos[i].transform.localScale *= 1.429f;
@@ -170,10 +202,79 @@ public class CustomizeManager : MonoBehaviour
 
     public void back_pressed()
     {
-        foreach(GameObject go in active_demos)
+        foreach (GameObject go in active_demos)
         {
             Destroy(go);
         }
+    }
+
+    public void add_coins(int i)
+    {
+        int coins = PlayerPrefs.GetInt("coins", 0);
+        coins = coins + i;
+        PlayerPrefs.SetInt("coins", coins);
+    }
+
+    public void remove_coins(int i)
+    {
+        int coins = PlayerPrefs.GetInt("coins", 0);
+        coins = coins - i;
+        PlayerPrefs.SetInt("coins", coins);
+    }
+
+    private void change_button()
+    {
+        if(customizer.GetSkinOwned(highlighted_index, type) && customizer.GetActiveSkin(type) != highlighted_index)
+        {
+            BuyPanel.SetActive(false);
+            BuyOrEquipText.text = "Equip";
+        }
+        else if(customizer.GetSkinOwned(highlighted_index, type) && customizer.GetActiveSkin(type) == highlighted_index)
+        {
+            BuyPanel.SetActive(false);
+            BuyOrEquipText.text = "Equipped";
+        }
+        else
+        {
+            BuyOrEquipText.text = "";
+            BuyPanel.SetActive(true);
+        }
+    }
+
+    public void BuyOrEquipPressed()
+    {
+        if(customizer.GetSkinOwned(highlighted_index, type))
+        {
+            Debug.Log("Equipped");
+            customizer.SetActiveSkin(highlighted_index, type);
+
+            main_menu_plaer.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + customizer.GetActiveSkin(2));
+            main_menu_obstacle.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForObstacles/ObstacleSkin" + customizer.GetActiveSkin(0));
+            change_button();
+        }
+        else
+        {
+            int num_pc = PlayerPrefs.GetInt("Coins", 0);
+            if(num_pc > 99)
+            {
+                customizer.SetSkinOwned(highlighted_index, type);
+                num_pc -= 100;
+                PlayerPrefs.SetInt("Coins", num_pc);
+                change_button();
+            }
+            else
+            {
+                Debug.Log("Not enough money");
+            }
+        }
+
+        SaveSystem.SaveCustomizer(customizer);
+    }
+
+    public void reset_customizer()
+    {
+        Customizer custom = new Customizer(num_obstacle_skins, num_rope_skins, num_player_skins);
+        SaveSystem.SaveCustomizer(custom);
     }
 
 }

@@ -16,7 +16,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private GameObject bb1;
 
 
-    
+    public int z_offset;
     public float total_launch_force = 1000f;
     private float launcher_move_increment = .5f;
     private bool launch;
@@ -53,15 +53,27 @@ public class PlayerMovement : MonoBehaviour
         swing_button = GameObject.Find("Grapple");
         button_touch.phase = TouchPhase.Ended;
         grapple_touch.phase = TouchPhase.Ended;
+
+        //Use players active skin
+        Customizer customizer = SaveSystem.LoadCustomizer();
+        int player_skin_index = customizer.GetActiveSkin(2);
+        Sprite sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + player_skin_index);
+        gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(joint == null)
+        {
+            boosting = false;
+        }
+
         if (!launched)
         {
             launch_button.SetActive(true);
         }
+
         if (Input.touchCount > 0)
         {
             grapple_touch = Input.GetTouch(0);
@@ -78,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
                 draw_line = false;
                 l.positionCount = 0;
                 grappled_to = null;
+                boosting = false;
                 Destroy(joint);
                 launch_button.SetActive(false);
             }
@@ -95,7 +108,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     if (!launched)
                         launch = true;
-                    else
+                    else if(joint != null)
                         boosting = true;
                 }
                 else if(button_touch.phase == TouchPhase.Ended)
@@ -109,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
         {
             l.positionCount = 2;
             List<Vector3> pos = new List<Vector3>();
-            pos.Add(player.transform.position);
+            pos.Add(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - z_offset));
             pos.Add(grappled_to.transform.position);
             l.SetPositions(pos.ToArray());
         }
@@ -189,28 +202,34 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Physics2D.OverlapCircle(player.transform.position, sphereRadius))
         {
+            float heading_towards = -1f;
             float closest = sphereRadius;
+
             Collider2D[] hold = Physics2D.OverlapCircleAll(player.transform.position, sphereRadius);
             foreach(Collider2D col in hold)
             {
-                if(grappled_to == null)
+                Vector3 obst_dir = col.transform.position - player.transform.position;
+                obst_dir.Normalize();
+
+                Vector3 player_velocity = playerRB.velocity;
+                player_velocity.Normalize();
+
+                if (Mathf.Abs(Vector2.Distance(player.transform.position, col.transform.position) - closest) < 2f)
+                {
+                    if (Vector3.Dot(obst_dir, player_velocity) > heading_towards && col.gameObject.layer == 7)
+                    {
+                        grappled_to = col.gameObject;
+                        closest = Vector3.Distance(col.transform.position, player.transform.position);
+                        heading_towards = Vector3.Dot(obst_dir, player_velocity);
+                    }
+                }
+                else if(Vector2.Distance(player.transform.position, col.transform.position) < closest && col.gameObject.layer == 7)
                 {
                     grappled_to = col.gameObject;
-                    closest = Vector2.Distance(player.transform.position, col.transform.position);
+                    closest = Vector3.Distance(col.transform.position, player.transform.position);
+                    heading_towards = Vector3.Dot(obst_dir, player_velocity);
                 }
-                else if(Vector2.Distance(player.transform.position, col.transform.position) < closest)
-                {
-                    closest = Vector2.Distance(player.transform.position, col.transform.position);
-                    grappled_to = col.gameObject;
-                }
-            }
-            if (grappled_to.layer != 7) //7 is the obstacle layer
-            {
-                grappled_to = null;
-            }
-            if(boost > 0)
-            {
-                launch_button.SetActive(true);
+                
             }
         }
 
@@ -228,6 +247,11 @@ public class PlayerMovement : MonoBehaviour
 
             joint.dampingRatio = 0f;
             joint.frequency = 10;
+
+            if (boost > 0)
+            {
+                launch_button.SetActive(true);
+            }
         }
 
     }
