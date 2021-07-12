@@ -29,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
 
     //Boost variabes
     private float boost;
-    private float boost_force = 15f;
+    private float boost_force = 50f;
     private bool boosting;
     private BoostBar bb;
 
@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
     private bool click_button;
     private GameObject launch_button;
     private GameObject swing_button;
-    private float press_radius = 5f;
+    private float press_radius = 10f;
     private Touch button_touch;
     private Touch grapple_touch;
 
@@ -155,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
                 Vector2 curr_dir = playerRB.velocity;
                 curr_dir.Normalize();
                 playerRB.AddForce(curr_dir * boost_force);
-                boost = boost - 1;
+                boost = boost - 5;
                 bb.boost = boost;
             }
             else
