@@ -10,6 +10,11 @@ public class UpdateCoinProgress : MonoBehaviour
         CoinProgress cp = SaveSystem.LoadCoinProgress();
         cp.levelCoinProg[current_level-1][2] = true;
         SaveSystem.SaveCoinProgress(cp);
-        gameObject.SetActive(false);
+
+        ParticleSystem ps = gameObject.GetComponent<ParticleSystem>();
+        ps.Play();
+
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        gameObject.GetComponent<BoxCollider2D>().enabled = false;
     }
 }
