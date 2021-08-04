@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class BounceScript : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public float bounce_force;
     void OnCollisionEnter2D(Collision2D collision)
     {
-        collision.gameObject.GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, 2000f));
+        bounce_force = 80f * (collision.relativeVelocity * transform.up).magnitude;
+        collision.gameObject.GetComponent<Rigidbody2D>().AddForce(bounce_force * transform.up);
     }
 }

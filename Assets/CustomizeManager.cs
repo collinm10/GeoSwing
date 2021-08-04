@@ -57,6 +57,7 @@ public class CustomizeManager : MonoBehaviour
         if (customizer == null)
         {
             customizer = new Customizer(obstacle_skin_demos.Length, rope_skin_demos.Length, player_skin_demos.Length);
+            SaveSystem.SaveCustomizer(customizer);
         }
 
         main_menu_plaer.GetComponent<MainMenuAnimation>().update_skins(customizer.GetActiveSkin(2), 2);

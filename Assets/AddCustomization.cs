@@ -17,6 +17,7 @@ public class AddCustomization : MonoBehaviour
             go.GetComponent<SpriteRenderer>().sprite = sprite;
         }
 
+        
     }
 
 }

@@ -24,6 +24,9 @@ public class LevelComplete : MonoBehaviour
     private PlayerMovement pm;
     private float time_completed;
     private PowerUpManager pum;
+    private CoinProgress cp;
+    private CoinManager cm;
+    public float gem_win_threshold;
 
     void Start()
     {
@@ -38,6 +41,7 @@ public class LevelComplete : MonoBehaviour
         pum = gameObject.GetComponent("PowerUpManager") as PowerUpManager;
 
         level_complete_panel.SetActive(false);
+        cm = gameObject.GetComponent("CoinManager") as CoinManager;
     }
 
     void FixedUpdate()
@@ -58,6 +62,10 @@ public class LevelComplete : MonoBehaviour
 
         //Open up the menu after winning
         level_complete_panel.SetActive(true);
+
+        //Disable boost bar
+        try { GameObject.Find("Boost bar").SetActive(false); }
+        catch { print("why"); }
 
         level_name.text = "Level " + CurrentLevel.ToString();
         Debug.Log("Level Complete!");
@@ -92,9 +100,21 @@ public class LevelComplete : MonoBehaviour
                 comment_label.text = close_to_best[Random.Range(0, close_to_best.Length)];
 
             time_difference.text = "+" + (time_completed - bestrun).ToString("0.00");
-            time_difference.color = new Color(1,0,0,1);
+            time_difference.color = new Color(1, 0, 0, 1);
         }
-        
+
+        //Add gems
+        cp = SaveSystem.LoadCoinProgress();
+
+        cp.levelCoinProg[CurrentLevel-1][0] = true;
+
+        if(time_completed < gem_win_threshold)
+        {
+            cp.levelCoinProg[CurrentLevel - 1][1] = true;
+        }
+
+        SaveSystem.SaveCoinProgress(cp);
+        cm.UpdateGemUI();
     }
 
     public void level_failed()
