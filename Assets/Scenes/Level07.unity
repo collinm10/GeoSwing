@@ -9897,7 +9897,7 @@ MonoBehaviour:
   comment_label: {fileID: 168552159}
   time_difference: {fileID: 168552158}
   CurrentLevel: 7
-  gem_win_threshold: 16
+  gem_win_threshold: 19
 --- !u!114 &1102536716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10362,11 +10362,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9062398261039506935, guid: bae97ac424809414c9a7a89cb3147bb0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 40
+      value: 40.45
       objectReference: {fileID: 0}
     - target: {fileID: 9062398261039506935, guid: bae97ac424809414c9a7a89cb3147bb0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 29.3
+      value: 16.34
       objectReference: {fileID: 0}
     - target: {fileID: 9062398261039506935, guid: bae97ac424809414c9a7a89cb3147bb0, type: 3}
       propertyPath: m_LocalPosition.z

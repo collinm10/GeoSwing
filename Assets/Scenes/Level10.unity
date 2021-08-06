@@ -655,6 +655,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2067000704}
     - target: {fileID: 5416607922068994125, guid: ee75a14c083e8c0439793de1b8fe05e6, type: 3}
+      propertyPath: m_Constraints
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5416607922068994125, guid: ee75a14c083e8c0439793de1b8fe05e6, type: 3}
       propertyPath: m_GravityScale
       value: 1
       objectReference: {fileID: 0}
@@ -8833,7 +8837,7 @@ MonoBehaviour:
   comment_label: {fileID: 28119718}
   time_difference: {fileID: 28119717}
   CurrentLevel: 10
-  gem_win_threshold: 16
+  gem_win_threshold: 27
 --- !u!114 &550526118
 MonoBehaviour:
   m_ObjectHideFlags: 0

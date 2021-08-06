@@ -330,7 +330,7 @@ MonoBehaviour:
   comment_label: {fileID: 285183342}
   time_difference: {fileID: 285183341}
   CurrentLevel: 6
-  gem_win_threshold: 16
+  gem_win_threshold: 17
 --- !u!4 &13787599
 Transform:
   m_ObjectHideFlags: 0

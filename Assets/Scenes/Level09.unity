@@ -20631,7 +20631,7 @@ MonoBehaviour:
   comment_label: {fileID: 866697577}
   time_difference: {fileID: 866697576}
   CurrentLevel: 9
-  gem_win_threshold: 16
+  gem_win_threshold: 30
 --- !u!114 &1240828779
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22025,7 +22025,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1333863389}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -177.6, y: 136, z: 0}
+  m_LocalPosition: {x: -179.3, y: 133.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1097226455}
@@ -26343,7 +26343,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1602247045}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -155.6, y: 115.8, z: 0}
+  m_LocalPosition: {x: -156.5, y: 115.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1097226455}
@@ -30997,7 +30997,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1929260507}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -172.1, y: 118, z: 0}
+  m_LocalPosition: {x: -169.3, y: 127.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1097226455}
