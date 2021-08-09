@@ -24,7 +24,7 @@ public class UIController : MonoBehaviour
     private GameObject TimeToBeat;
     private int currLevel;
 
-    private float[] level_times_to_beat = {3.5f, 6f, 10f, 11f, 15f, 20f, 10f, 10f, 10f, 10f};
+    private float[] level_times_to_beat = {3.5f, 6f, 13f, 10f, 14f, 18f, 23f, 19f, 30f, 27f};
 
     void Awake()
     {
