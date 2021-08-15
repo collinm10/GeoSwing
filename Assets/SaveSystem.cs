@@ -69,4 +69,37 @@ public static class SaveSystem
 
         stream.Close();
     }
+
+    public static LevelProgress LoadLevelUnlockProg()
+    {
+        string path = Application.persistentDataPath + "/LevelUnlockProg.dat";
+        if (File.Exists(path))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(path, FileMode.Open);
+
+            LevelProgress lp = formatter.Deserialize(stream) as LevelProgress;
+
+            stream.Close();
+
+            return lp;
+        }
+        else
+        {
+            Debug.Log("Save file not found.");
+            return null;
+        }
+    }
+
+    public static void SaveLevelProgress(LevelProgress lp)
+    {
+        BinaryFormatter formatter = new BinaryFormatter();
+
+        string path = Application.persistentDataPath + "/LevelUnlockProg.dat";
+        FileStream stream = new FileStream(path, FileMode.Create);
+
+        formatter.Serialize(stream, lp);
+
+        stream.Close();
+    }
 }

@@ -15,6 +15,8 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject customize_player_canvas;
     [SerializeField] private GameObject customize_canvas;
     [SerializeField] private GameObject level_info_panel;
+    [SerializeField] private GameObject BuyLevelPanel;
+    [SerializeField] private GameObject NotEnoughGemsPanel;
 
     private GameObject[] level_buttons;
     public Sprite CoinPrefab;
@@ -28,12 +30,21 @@ public class UIController : MonoBehaviour
 
     void Awake()
     {
+        int coins = 25;
+        PlayerPrefs.SetInt("Coins", coins);
+
+        LevelProgress lp = new LevelProgress(10);
+        SaveSystem.SaveLevelProgress(lp);
+
         level_buttons = new GameObject[scene_names.Length];
     }
 
     void Start()
     {
         customize_level_buttons();
+        SetLevelUnlocks();
+        LevelCanvas.SetActive(false);
+
     }
 
     public void load_level()
@@ -56,6 +67,7 @@ public class UIController : MonoBehaviour
         disable_level_canvas();
         disable_level_info_panel();
         enable_main_canvas();
+        disable_buy_level();
     }
 
     public void open_customize_obstacle()
@@ -65,6 +77,7 @@ public class UIController : MonoBehaviour
         disable_customize_rope();
         disable_level_canvas();
         disable_main_canvas();
+        disable_buy_level();
     }
 
     public void open_customize_rope()
@@ -74,6 +87,7 @@ public class UIController : MonoBehaviour
         enable_customize_rope();
         disable_level_canvas();
         disable_main_canvas();
+        disable_buy_level();
     }
 
     public void open_customize_player()
@@ -83,17 +97,28 @@ public class UIController : MonoBehaviour
         disable_customize_rope();
         disable_level_canvas();
         disable_main_canvas();
+        disable_buy_level();
     }
 
     public void open_level_info_panel(int level)
     {
-        disable_customize_obstacle();
-        disable_customize_player();
-        disable_customize_rope();
-        disable_level_canvas();
-        disable_main_canvas();
-        enable_level_info_panel();
-        set_level_info(level);
+        //Check if level is unlocked already
+        LevelProgress lp1 = SaveSystem.LoadLevelUnlockProg();
+
+        if (lp1.levelUnlockProg[level - 1])
+        {
+            enable_level_info_panel();
+            disable_customize_obstacle();
+            disable_customize_player();
+            disable_customize_rope();
+            disable_level_canvas();
+            disable_main_canvas();
+            set_level_info(level);
+        }
+        else
+        {
+            set_buy_level(level);
+        }
     }
 
     private void enable_main_canvas()
@@ -102,6 +127,15 @@ public class UIController : MonoBehaviour
         customize_canvas.SetActive(false);
     }
 
+    public void disable_buy_level()
+    {
+        BuyLevelPanel.SetActive(false);
+    }
+
+    public void disable_not_enough_gems()
+    {
+        NotEnoughGemsPanel.SetActive(false); 
+    }
     private void disable_main_canvas()
     {
         MainMenuCanvas.SetActive(false);
@@ -230,6 +264,93 @@ public class UIController : MonoBehaviour
 
         }
 
-        LevelCanvas.SetActive(false);
+    }
+
+    public void SetLevelUnlocks()
+    {
+        LevelProgress lp = SaveSystem.LoadLevelUnlockProg();
+
+        if (lp == null)
+        {
+            lp = new LevelProgress(scene_names.Length);
+            SaveSystem.SaveLevelProgress(lp);
+        }
+
+        for(int i = 0; i < scene_names.Length; i++)
+        {
+            //Check if level is unlocked
+            if (!lp.levelUnlockProg[i])
+            {
+                //Disable gems if not unlocked
+                string level_name_in_menu = "LevelButton (" + i.ToString() + ")";
+                for (int j = 0; j < 3; j++)
+                {
+                    string hold = "Gem" + (i+1).ToString() + (j+1).ToString();
+                    try
+                    {
+                        GameObject.Find(hold).SetActive(false);
+                    }
+                    catch { }
+
+                }
+            }
+            else if(i > 2)
+            {
+                //Disable the lock icon
+                string hold = "UnlockIcon" + (i + 1).ToString();
+                try
+                {
+                    GameObject.Find(hold).SetActive(false);
+                }
+                catch {}
+
+                //Re-enable gems
+                for (int j = 0; j < 3; j++)
+                {
+                    string hold1 = "Gem" + (i + 1).ToString() + (j + 1).ToString();
+                    try
+                    {
+                        GameObject.Find(hold1).SetActive(true);
+                    }
+                    catch {}
+                }
+            }
+        }
+
+    }
+
+    public void set_buy_level(int level)
+    {
+        BuyLevelPanel.SetActive(true);
+        string level_name = "Level " + level.ToString();
+        GameObject.Find("BuyLevelName").GetComponent<Text>().text = level_name;
+
+        string buy_level_label = "Buy level " + level.ToString() + " for 5 gems?";
+        GameObject.Find("BuyLevelLabel").GetComponent<Text>().text = buy_level_label;
+
+        int coins = PlayerPrefs.GetInt("Coins", 0);
+        GameObject.Find("BuyLevelNumCoins").GetComponent<Text>().text = coins.ToString();
+
+        currLevel = level;
+    }
+
+    public void Buy_Level()
+    {
+        int coins = PlayerPrefs.GetInt("Coins", 0);
+        if(coins >= 5)
+        {
+            coins -= 5;
+            PlayerPrefs.SetInt("Coins", coins);
+            LevelProgress lp = SaveSystem.LoadLevelUnlockProg();
+            lp.levelUnlockProg[currLevel - 1] = true;
+            SaveSystem.SaveLevelProgress(lp);
+            SetLevelUnlocks();
+            BuyLevelPanel.SetActive(false);
+        }
+        else
+        {
+            NotEnoughGemsPanel.SetActive(true);
+            GameObject.Find("NotEnoughGemsNumCoins").GetComponent<Text>().text = coins.ToString();
+        }
     }
 }

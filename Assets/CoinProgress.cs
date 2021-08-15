@@ -26,7 +26,7 @@ public class CoinProgress
         try { levelCoinProg[i] = b; return true; }
         catch{return false;}
     }
-
+    
     public void AddNewLevel()
     {
         bool[][] b = new bool[levelCoinProg.Length + 1][];

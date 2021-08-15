@@ -16,5 +16,9 @@ public class UpdateCoinProgress : MonoBehaviour
 
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
         gameObject.GetComponent<BoxCollider2D>().enabled = false;
+
+        int coins = PlayerPrefs.GetInt("Coins", 0);
+        coins = coins + 1;
+        PlayerPrefs.SetInt("Coins", coins);
     }
 }

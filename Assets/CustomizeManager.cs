@@ -277,5 +277,4 @@ public class CustomizeManager : MonoBehaviour
         Customizer custom = new Customizer(num_obstacle_skins, num_rope_skins, num_player_skins);
         SaveSystem.SaveCustomizer(custom);
     }
-
 }

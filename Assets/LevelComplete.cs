@@ -81,6 +81,7 @@ public class LevelComplete : MonoBehaviour
         {
             PlayerPrefs.SetFloat(level_key, time_completed);
             highscore.text = time_completed.ToString("0.00");
+            GameObject.Find("StartGemTime").GetComponent<Text>().text = time_completed.ToString("0.00");
             comment_label.text = beat_best[Random.Range(0, beat_best.Length)];
 
             if (bestrun != 1000f)
