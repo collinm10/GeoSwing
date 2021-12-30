@@ -8,6 +8,9 @@ TagManager:
   - Power Up
   - Obstacle
   - Coin
+  - BackgroundTag
+  - ScoreCollider
+  - InfiniteGeneratorCollider
   layers:
   - Default
   - TransparentFX
@@ -17,7 +20,7 @@ TagManager:
   - UI
   - Post Processing
   - Obstacle
-  - 
+  - Background
   - 
   - 
   - 

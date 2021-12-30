@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,43 +9,27 @@ public class CustomizeManager : MonoBehaviour
     public GameObject main_menu_plaer;
     public GameObject main_menu_obstacle;
 
+    //Base gameobjects for store skins
+    public GameObject base_player_skin;
+    public GameObject base_obstacle_skin;
+
     public Transform skin_location;
 
-    public int num_player_skins;
-    public int num_obstacle_skins;
-    public int num_rope_skins;
-
-    [Header("SPRITE NAMES")]
-    //Sprite names
-    public string[] player_sprite_names;
-    public string[] obstacle_sprite_names;
-    public string[] rope_sprite_names;
-
-    [Header("MATERIAL NAMES")]
-    //Material names
-    public string[] player_material_names;
-    public string[] obstacle_material_names;
-    public string[] rope_material_names;
-
-    [Header("Demo Prefabs")]
-    public GameObject[] player_skin_demos;
-    public GameObject[] obstacle_skin_demos;
-    public GameObject[] rope_skin_demos;
+    //Number of each type of skin
+    private int num_player_skins;
+    private int num_obstacle_skins;
 
     [Header("Scroll Buttons")]
     public GameObject button1;
     public GameObject button2;
 
-    //skin arrays
-    private Skin[] player_skins;
-    private Skin[] obstacle_skins;
-    private Skin[] rope_skins;
-
     private GameObject[] active_demos;
     private int highlighted_index;
 
+    //Obstacle or Player skins?
     private int type;
 
+    //UI Elements
     private GameObject BuyOrEquip;
     public Text BuyOrEquipText;
     public GameObject BuyPanel;
@@ -53,11 +38,38 @@ public class CustomizeManager : MonoBehaviour
 
     void Awake()
     {
+        reset_customizer();
+
+        //Initialize some variables
+        num_obstacle_skins = 0;
+        num_player_skins = 0;
+
         customizer = SaveSystem.LoadCustomizer();
+
         if (customizer == null)
         {
-            customizer = new Customizer(obstacle_skin_demos.Length, rope_skin_demos.Length, player_skin_demos.Length);
+            customizer = new Customizer();
             SaveSystem.SaveCustomizer(customizer);
+        }
+
+        //Check if the player owned list still match the amount of skins in the folder
+        DirectoryInfo playerDir = new DirectoryInfo("Assets/Resources/ForPlayer");
+        FileInfo[] playerInfo = playerDir.GetFiles("*.png");
+
+        foreach (FileInfo fi in playerInfo)
+        {
+            Debug.Log(fi.Name);
+            num_player_skins++;
+        }
+
+        //Check if the obstacle owned list still match the amount of skins in the folder
+        DirectoryInfo obstDir = new DirectoryInfo("Assets/Resources/ForObstacles");
+        FileInfo[] obstInfo = obstDir.GetFiles("*.png");
+
+        foreach (FileInfo fi in obstInfo)
+        {
+            Debug.Log(fi.Name);
+            num_obstacle_skins++;
         }
 
         main_menu_plaer.GetComponent<MainMenuAnimation>().update_skins(customizer.GetActiveSkin(2), 2);
@@ -88,7 +100,8 @@ public class CustomizeManager : MonoBehaviour
                     else
                         pos = new Vector3(skin_location.position.x + i * 30f, skin_location.position.y, skin_location.position.z);
 
-                    active_demos[i] = Instantiate(obstacle_skin_demos[i], pos, skin_location.rotation);
+                    active_demos[i] = Instantiate(base_obstacle_skin, pos, skin_location.rotation);
+                    active_demos[i].GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForObstacles/ObstacleSkin" + (i).ToString());
 
 
                     if (active_demos[i].transform.position != skin_location.position)
@@ -114,8 +127,8 @@ public class CustomizeManager : MonoBehaviour
                     else
                         pos = new Vector3(skin_location.position.x + i * 30f, skin_location.position.y, skin_location.position.z);
 
-                    active_demos[i] = Instantiate(player_skin_demos[i], pos, skin_location.rotation);
-
+                    active_demos[i] = Instantiate(base_player_skin, pos, skin_location.rotation);
+                    active_demos[i].GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + (i).ToString());
 
                     if (active_demos[i].transform.position != skin_location.position)
                     {
@@ -274,7 +287,7 @@ public class CustomizeManager : MonoBehaviour
 
     public void reset_customizer()
     {
-        Customizer custom = new Customizer(num_obstacle_skins, num_rope_skins, num_player_skins);
+        Customizer custom = new Customizer();
         SaveSystem.SaveCustomizer(custom);
     }
 }

@@ -43,10 +43,18 @@ public class PlayerMovement : MonoBehaviour
     private float press_radius = 10f;
     private Touch button_touch;
     private Touch grapple_touch;
+    private GameObject gm;
+
+    private EndlessScoreKeeper score_keeper;
+    private ChunkGenerator chunk_generator;
+
+    private GameObject pusher;
 
     // Start is called before the first frame update
     void Start()
     {
+        pusher = GameObject.Find("Pusher");
+        gm = GameObject.Find("GameManager");
         boost = 0f;
         bb = bb1.GetComponent("BoostBar") as BoostBar;
         launch_button = GameObject.Find("Launch Boost Button");
@@ -59,6 +67,12 @@ public class PlayerMovement : MonoBehaviour
         int player_skin_index = customizer.GetActiveSkin(2);
         Sprite sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + player_skin_index);
         gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+
+        //Get Score Keeper
+        score_keeper = gm.GetComponent("EndlessScoreKeeper") as EndlessScoreKeeper;
+
+        //Get Chunk generator
+        chunk_generator = gm.GetComponent("ChunkGenerator") as ChunkGenerator;
     }
 
     // Update is called once per frame
@@ -140,6 +154,9 @@ public class PlayerMovement : MonoBehaviour
 
         if(launch && launcher.transform.position == end_of_launcher.position)
         {
+            MovePusher mp = pusher.GetComponent("MovePusher") as MovePusher;
+            mp.go = true;
+
             launch = false;
             Vector2 launchForce = new Vector2(total_launch_force * ((90f - angle_to_launch) / 90f), angle_to_launch * (total_launch_force/90));
             playerRB.AddForce(launchForce);
@@ -173,7 +190,36 @@ public class PlayerMovement : MonoBehaviour
         if (col.gameObject.tag == "Finish")
             lc.level_complete();
         else if (col.gameObject.tag == "Hazard")
-            lc.level_failed();
+            try { lc.level_failed(); }
+            catch {
+                try { gm.GetComponent<ResetGame>().reset_level(); }
+                catch{ gm.GetComponent<ResetGame>().reset_infinite(); }
+            } 
+    }
+
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "ScoreCollider")
+        {
+            score_keeper.UpdateScore();
+
+            //Destroy Trigger
+            Destroy(collision.gameObject);
+        }
+
+        if (collision.gameObject.name == "UpCollider")
+            chunk_generator.GenerateChunk(0, collision.transform.parent.gameObject);
+        else if (collision.gameObject.name == "DownCollider")
+            chunk_generator.GenerateChunk(2, collision.transform.parent.gameObject);
+        else if (collision.gameObject.name == "RightCollider")
+            chunk_generator.GenerateChunk(1, collision.transform.parent.gameObject);
+        else if (collision.gameObject.name == "LeftCollider")
+            chunk_generator.GenerateChunk(3, collision.transform.parent.gameObject);
+        
+        if(collision.gameObject.tag == "InfiniteGeneratorCollider")
+        {
+            Destroy(collision.gameObject);
+        }
     }
 
     public void reset()
@@ -189,6 +235,11 @@ public class PlayerMovement : MonoBehaviour
         start_time = 0f;
         launch_button.GetComponentInChildren<Text>().text = "Launch";
         launch_button.SetActive(true);
+
+        MovePusher mp = pusher.GetComponent("MovePusher") as MovePusher;
+        mp.go = false;
+        pusher.transform.position = GameObject.Find("PusherStart").transform.position;
+        mp.speed = 10;
     }
 
     public void AddBoost()

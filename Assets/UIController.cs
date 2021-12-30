@@ -30,11 +30,16 @@ public class UIController : MonoBehaviour
 
     void Awake()
     {
-        int coins = 25;
+        int coins = 100;
         PlayerPrefs.SetInt("Coins", coins);
 
-        LevelProgress lp = new LevelProgress(10);
-        SaveSystem.SaveLevelProgress(lp);
+        LevelProgress lp = SaveSystem.LoadLevelUnlockProg();
+        lp = null;
+        if(lp == null)
+        {
+            lp = new LevelProgress(10);
+            SaveSystem.SaveLevelProgress(lp);
+        }
 
         level_buttons = new GameObject[scene_names.Length];
     }
@@ -52,6 +57,15 @@ public class UIController : MonoBehaviour
         SceneManager.LoadScene(scene_names[currLevel-1]);
     }
 
+    public void load_infinite()
+    {
+        SceneManager.LoadScene("Infinite");
+    }
+
+    public void load_endless()
+    {
+        SceneManager.LoadScene("Endless");
+    }
     public void open_levels_screen()
     {
         disable_main_canvas();
@@ -325,7 +339,7 @@ public class UIController : MonoBehaviour
         string level_name = "Level " + level.ToString();
         GameObject.Find("BuyLevelName").GetComponent<Text>().text = level_name;
 
-        string buy_level_label = "Buy level " + level.ToString() + " for 5 gems?";
+        string buy_level_label = "Buy level for       ?";
         GameObject.Find("BuyLevelLabel").GetComponent<Text>().text = buy_level_label;
 
         int coins = PlayerPrefs.GetInt("Coins", 0);
@@ -337,9 +351,9 @@ public class UIController : MonoBehaviour
     public void Buy_Level()
     {
         int coins = PlayerPrefs.GetInt("Coins", 0);
-        if(coins >= 5)
+        if(coins >= 3)
         {
-            coins -= 5;
+            coins -= 3;
             PlayerPrefs.SetInt("Coins", coins);
             LevelProgress lp = SaveSystem.LoadLevelUnlockProg();
             lp.levelUnlockProg[currLevel - 1] = true;

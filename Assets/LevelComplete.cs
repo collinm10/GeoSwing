@@ -28,8 +28,13 @@ public class LevelComplete : MonoBehaviour
     private CoinManager cm;
     public float gem_win_threshold;
 
+    private GameObject CanvasAtEnd;
+
     void Start()
     {
+        CanvasAtEnd = GameObject.Find("CanvasAtEnd");
+        CanvasAtEnd.SetActive(false);
+
         time_completed = 0;
 
         far_off_best = new string[]{ "lmao not even close", "did you take a break?", "wow... let's not talk about that", "at least try please" };
@@ -131,7 +136,7 @@ public class LevelComplete : MonoBehaviour
         player.transform.position = player_start.position;
 
         player.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-        player.GetComponent<Rigidbody2D>().gravityScale = 1;
+        player.GetComponent<Rigidbody2D>().gravityScale = .8f;
 
         pm.reset();
 
@@ -147,8 +152,35 @@ public class LevelComplete : MonoBehaviour
 
     public void next_level()
     {
-        string next_level_name = "Level0" + (CurrentLevel + 1).ToString();
-        SceneManager.LoadScene(next_level_name);
+
+        //First check if next level is unlocked
+        LevelProgress lp = SaveSystem.LoadLevelUnlockProg();
+
+        if(lp.levelUnlockProg[CurrentLevel])
+        {
+            string next_level_name = "Level0" + (CurrentLevel + 1).ToString();
+            SceneManager.LoadScene(next_level_name);
+        }
+        else
+        {
+            //If it's not unlocked then offer buy option
+            set_buy_level(CurrentLevel + 1);
+        }
+        
+    }
+
+    public void set_buy_level(int level)
+    {
+        level_complete_panel.SetActive(false);
+
+        CanvasAtEnd.SetActive(true);
+        GameObject.Find("BuyLevel").transform.position = level_complete_panel.transform.position;
+
+        string level_name = "Level " + level.ToString();
+        GameObject.Find("BuyLevelName").GetComponent<Text>().text = level_name;
+
+        int coins = PlayerPrefs.GetInt("Coins", 0);
+        GameObject.Find("BuyLevelNumCoins").GetComponent<Text>().text = coins.ToString();
     }
 
 }
