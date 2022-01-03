@@ -9219,6 +9219,7 @@ MonoBehaviour:
   BuyOrEquipText: {fileID: 758550437}
   BuyPanel: {fileID: 314411975}
   NumPlayerCoins: {fileID: 1359305957}
+  CostOfSkin: {fileID: 685780659}
 --- !u!114 &1058718792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9233,7 +9234,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _androidGameId: 4198723
   _iOsGameId: 4198722
-  _testMode: 1
+  _testMode: 0
   _enablePerPlacementMode: 1
 --- !u!114 &1058718793
 MonoBehaviour:

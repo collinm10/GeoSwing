@@ -17,7 +17,7 @@ public class InterstitialController : MonoBehaviour
 
     public void CreateAndLoadAd()
     {
-        interstitial = new InterstitialAd("ca-app-pub-3940256099942544/4411468910");
+        interstitial = new InterstitialAd("ca-app-pub-5685645820979871/5201059516");
 
         // Called when an ad request has successfully loaded.
         this.interstitial.OnAdLoaded += HandleInterstitialAdLoaded;

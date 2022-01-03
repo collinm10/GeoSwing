@@ -20,7 +20,7 @@ public class RewardedAdsButton : MonoBehaviour
     public void CreateAndLoadAd()
     {
         //Real AD Unit ID: ca-app-pub-5685645820979871/6198252894
-        rewardedAd = new RewardedAd("ca-app-pub-3940256099942544/1712485313");
+        rewardedAd = new RewardedAd("ca-app-pub-5685645820979871/6198252894");
 
         // Called when an ad request has successfully loaded.
         this.rewardedAd.OnAdLoaded += HandleRewardedAdLoaded;
