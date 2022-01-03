@@ -29,6 +29,10 @@ public class LevelComplete : MonoBehaviour
     public float gem_win_threshold;
 
     private GameObject CanvasAtEnd;
+    private GameObject BuyLevelPanel;
+    private GameObject NotEnoughGemsPanel;
+
+    private int adCounter = 0;
 
     void Start()
     {
@@ -112,11 +116,20 @@ public class LevelComplete : MonoBehaviour
         //Add gems
         cp = SaveSystem.LoadCoinProgress();
 
-        cp.levelCoinProg[CurrentLevel-1][0] = true;
+        if (!cp.levelCoinProg[CurrentLevel - 1][0])
+        {
+            cp.levelCoinProg[CurrentLevel - 1][0] = true;
+            int c = PlayerPrefs.GetInt("Coins", 0);
+            c++;
+            PlayerPrefs.SetInt("Coins", c);
+        }
 
-        if(time_completed < gem_win_threshold)
+        if(time_completed < gem_win_threshold && !cp.levelCoinProg[CurrentLevel - 1][1])
         {
             cp.levelCoinProg[CurrentLevel - 1][1] = true;
+            int c = PlayerPrefs.GetInt("Coins", 0);
+            c++;
+            PlayerPrefs.SetInt("Coins", c);
         }
 
         SaveSystem.SaveCoinProgress(cp);
@@ -125,6 +138,17 @@ public class LevelComplete : MonoBehaviour
 
     public void level_failed()
     {
+        adCounter = PlayerPrefs.GetInt("Ad Counter", 0);
+
+        if (++adCounter >= 25)
+        {
+            //Run ad
+            InterstitialController ic = GameObject.Find("InterstitialManager").GetComponent("InterstitialController") as InterstitialController;
+            ic.ShowAd();
+            adCounter = 0;
+        }
+        PlayerPrefs.SetInt("Ad Counter", adCounter);
+
         reset_level();
     }
 
@@ -174,13 +198,24 @@ public class LevelComplete : MonoBehaviour
         level_complete_panel.SetActive(false);
 
         CanvasAtEnd.SetActive(true);
-        GameObject.Find("BuyLevel").transform.position = level_complete_panel.transform.position;
+
+        if(BuyLevelPanel == null)
+            BuyLevelPanel = GameObject.Find("BuyLevel");
+
+        BuyLevelPanel.SetActive(true);
+
+        BuyLevelPanel.transform.position = level_complete_panel.transform.position;
 
         string level_name = "Level " + level.ToString();
         GameObject.Find("BuyLevelName").GetComponent<Text>().text = level_name;
 
         int coins = PlayerPrefs.GetInt("Coins", 0);
         GameObject.Find("BuyLevelNumCoins").GetComponent<Text>().text = coins.ToString();
+    }
+
+    public void set_level_complete_panel()
+    {
+        level_complete_panel.SetActive(true);
     }
 
 }

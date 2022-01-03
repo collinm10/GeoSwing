@@ -9,11 +9,18 @@ public class Customizer
     private List<bool> player_skin_owned;
     private List<bool> obstacle_skin_owned;
 
+    public int[] player_cost;
+    public int[] obstacle_cost;
+
     public int active_player_skin_index;
     public int active_obstacle_skin_index;
 
     public Customizer()
     {
+        //Define the costs for skins
+        player_cost = new int[24] { 0, 3, 3, 9, 9, 9, 9, 9, 9, 9, 9, 9, 5, 12, 15, 15, 15, 15, 15, 15, 15, 20, 20, 30 };
+        obstacle_cost = new int[4] { 0, 9, 9, 9 };
+
         //Player starts out owning and using index 0
         active_obstacle_skin_index = 0;
         active_player_skin_index = 0;

@@ -10,12 +10,15 @@ public class MainMenuAnimation : MonoBehaviour
     public GameObject obstacle;
     private float radius = 0f;
     private SpringJoint2D joint;
+    private GameObject ap;
 
     void Start()
     {
+        ap = GameObject.Find("AnchorPoint");
+
         joint = player.gameObject.AddComponent<SpringJoint2D>();
         joint.autoConfigureConnectedAnchor = false;
-        joint.connectedAnchor = obstacle.transform.position;
+        joint.connectedAnchor = new Vector2(obstacle.transform.position.x, obstacle.transform.position.y);
 
         joint.distance = Vector2.Distance(player.transform.position, obstacle.transform.position);
 
@@ -23,6 +26,7 @@ public class MainMenuAnimation : MonoBehaviour
 
         joint.dampingRatio = 0f;
         joint.frequency = 10;
+
     }
 
     void Update()
@@ -31,11 +35,13 @@ public class MainMenuAnimation : MonoBehaviour
         List<Vector3> pos = new List<Vector3>();
         Vector3 edge = player.transform.position - obstacle.transform.position;
         edge.Normalize();
-        Vector3 hold = player.transform.position + edge * radius;
+        Vector3 hold = ap.transform.position;
         hold.z = hold.z - z_offset;
         pos.Add(hold);
         pos.Add(obstacle.transform.position);
         l.SetPositions(pos.ToArray());
+
+        player.transform.GetChild(0).up = obstacle.transform.position - player.transform.position;
     }
 
     public void update_skins(int index, int type)
@@ -47,8 +53,8 @@ public class MainMenuAnimation : MonoBehaviour
             case 1:
                 break;
             case 2:
-                gameObject.GetComponent<SpriteRenderer>().color = Color.white;
-                gameObject.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + index);
+                transform.GetChild(0).GetComponent<SpriteRenderer>().color = Color.white;
+                transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + index);
                 break;
         }
     }

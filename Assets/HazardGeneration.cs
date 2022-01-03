@@ -10,6 +10,7 @@ public class HazardGeneration : MonoBehaviour
     public bool generated_obstacle = true;
 
     [SerializeField] GameObject HazardPrefab;
+    [SerializeField] GameObject GemPrefab;
     [SerializeField] GameObject ScoreCollider;
     private float gap_size;
 
@@ -36,6 +37,9 @@ public class HazardGeneration : MonoBehaviour
 
     public float next_gap_offset;
 
+    //Reference endless score keeper
+    private EndlessScoreKeeper scoreKeeper;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -58,6 +62,8 @@ public class HazardGeneration : MonoBehaviour
 
         top_of_spawn_range = upper_hazard.position.y - half_gap_size;
         bottom_of_spawn_range = lower_hazard.position.y + half_gap_size + 5f;
+
+        scoreKeeper = GameObject.Find("GameManager").GetComponent("EndlessScoreKeeper") as EndlessScoreKeeper;
 
     }
 
@@ -131,6 +137,14 @@ public class HazardGeneration : MonoBehaviour
                 {
                     float random_offset = Random.Range(0, 5);
                     pos += random_offset;
+                }
+
+                //Maybe add gem?
+
+                int maybe = Random.Range(0, 10);
+                if(maybe == 1)
+                {
+                   Instantiate(GemPrefab, new Vector3(player.transform.position.x + HazardGenerationOffset, pos, 5), Quaternion.identity);
                 }
 
                 //Generate score collider at gap

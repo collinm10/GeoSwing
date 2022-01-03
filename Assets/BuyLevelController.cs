@@ -9,14 +9,16 @@ public class BuyLevelController : MonoBehaviour
     private LevelComplete gm;
     private GameObject BuyLevelPanel;
     private GameObject NotEnoughGemsPanel;
-
+    private GameObject IAPPanel;
     // Start is called before the first frame update
     void Start()
     {
         gm = GameObject.Find("GameManager").GetComponent("LevelComplete") as LevelComplete;
         BuyLevelPanel = GameObject.Find("BuyLevel");
         NotEnoughGemsPanel = GameObject.Find("NotEnoughGems");
+        IAPPanel = GameObject.Find("IAP Panel");
 
+        IAPPanel.SetActive(false);
         NotEnoughGemsPanel.SetActive(false);
     }
 
@@ -53,4 +55,15 @@ public class BuyLevelController : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
+    public void OpenIAP()
+    {
+        IAPPanel.SetActive(true);
+        NotEnoughGemsPanel.SetActive(false);
+        IAPPanel.transform.position = BuyLevelPanel.transform.position;
+    }
+
+    public void CloseIAP()
+    {
+        IAPPanel.SetActive(false);
+    }
 }

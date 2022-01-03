@@ -57,11 +57,36 @@ public class ResetGame : MonoBehaviour
         //Reset backgrounds
         GameObject[] gms = GameObject.FindGameObjectsWithTag("BackgroundTag");
 
-        Destroy(gms[1]);
+        try
+        {
+            Destroy(gms[1]);
+        }
+        catch
+        {
+            Debug.Log("No other background");
+        }
 
         GenerateNext_Trigger_Holder.SetActive(true);
 
         gameObject.SendMessage("HighscoreCheck");
+
+        //Run ad?
+        int adCounter = PlayerPrefs.GetInt("Ad Counter", 0);
+
+        if (++adCounter >= 25)
+        {
+            //Run ad
+            InterstitialController ic = GameObject.Find("InterstitialManager").GetComponent("InterstitialController") as InterstitialController;
+            ic.ShowAd();
+            adCounter = 0;
+        }
+
+        PlayerPrefs.SetInt("Ad Counter", adCounter);
+
+        GameObject[] gems = GameObject.FindGameObjectsWithTag("Gem");
+        foreach(GameObject gem in gems){
+            Destroy(gem);
+        }
     }
 
     public void back_button_pressed()

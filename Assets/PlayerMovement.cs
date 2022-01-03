@@ -50,9 +50,14 @@ public class PlayerMovement : MonoBehaviour
 
     private GameObject pusher;
 
+    private GameObject ap;
+
+    private GameObject spriteRendererGO;
+
     // Start is called before the first frame update
     void Start()
     {
+        ap = GameObject.Find("AnchorPoint");
         pusher = GameObject.Find("Pusher");
         gm = GameObject.Find("GameManager");
         boost = 0f;
@@ -66,7 +71,8 @@ public class PlayerMovement : MonoBehaviour
         Customizer customizer = SaveSystem.LoadCustomizer();
         int player_skin_index = customizer.GetActiveSkin(2);
         Sprite sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + player_skin_index);
-        gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+        spriteRendererGO = transform.GetChild(0).gameObject;
+        transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = sprite;
 
         //Get Score Keeper
         score_keeper = gm.GetComponent("EndlessScoreKeeper") as EndlessScoreKeeper;
@@ -136,9 +142,10 @@ public class PlayerMovement : MonoBehaviour
         {
             l.positionCount = 2;
             List<Vector3> pos = new List<Vector3>();
-            pos.Add(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z - z_offset));
+            pos.Add(new Vector3(ap.transform.position.x, ap.transform.position.y, player.transform.position.z - z_offset));
             pos.Add(grappled_to.transform.position);
             l.SetPositions(pos.ToArray());
+            spriteRendererGO.transform.up = grappled_to.transform.position - transform.position;
         }
     }
 
@@ -154,8 +161,15 @@ public class PlayerMovement : MonoBehaviour
 
         if(launch && launcher.transform.position == end_of_launcher.position)
         {
-            MovePusher mp = pusher.GetComponent("MovePusher") as MovePusher;
-            mp.go = true;
+            try
+            {
+                MovePusher mp = pusher.GetComponent("MovePusher") as MovePusher;
+                mp.go = true;
+            }
+            catch
+            {
+                Debug.Log("Not endless idiot1");
+            }
 
             launch = false;
             Vector2 launchForce = new Vector2(total_launch_force * ((90f - angle_to_launch) / 90f), angle_to_launch * (total_launch_force/90));
@@ -190,11 +204,14 @@ public class PlayerMovement : MonoBehaviour
         if (col.gameObject.tag == "Finish")
             lc.level_complete();
         else if (col.gameObject.tag == "Hazard")
+        {
             try { lc.level_failed(); }
-            catch {
+            catch
+            {
                 try { gm.GetComponent<ResetGame>().reset_level(); }
-                catch{ gm.GetComponent<ResetGame>().reset_infinite(); }
-            } 
+                catch { gm.GetComponent<ResetGame>().reset_infinite(); }
+            }
+        }
     }
 
     void OnTriggerEnter2D(Collider2D collision)
@@ -236,10 +253,14 @@ public class PlayerMovement : MonoBehaviour
         launch_button.GetComponentInChildren<Text>().text = "Launch";
         launch_button.SetActive(true);
 
-        MovePusher mp = pusher.GetComponent("MovePusher") as MovePusher;
-        mp.go = false;
-        pusher.transform.position = GameObject.Find("PusherStart").transform.position;
-        mp.speed = 10;
+        try
+        {
+            MovePusher mp = pusher.GetComponent("MovePusher") as MovePusher;
+            mp.go = false;
+            pusher.transform.position = GameObject.Find("PusherStart").transform.position;
+            mp.speed = 10;
+        }
+        catch { Debug.Log("Not endless idiot"); }
     }
 
     public void AddBoost()

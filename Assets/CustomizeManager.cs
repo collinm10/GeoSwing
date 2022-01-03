@@ -34,15 +34,19 @@ public class CustomizeManager : MonoBehaviour
     public Text BuyOrEquipText;
     public GameObject BuyPanel;
     public Text NumPlayerCoins;
+    public Text CostOfSkin;
+
     private Customizer customizer;
+
+    private UIController ui;
 
     void Awake()
     {
-        reset_customizer();
-
         //Initialize some variables
         num_obstacle_skins = 0;
         num_player_skins = 0;
+
+        ui = gameObject.GetComponent("UIController") as UIController;
 
         customizer = SaveSystem.LoadCustomizer();
 
@@ -58,8 +62,10 @@ public class CustomizeManager : MonoBehaviour
 
         foreach (FileInfo fi in playerInfo)
         {
-            Debug.Log(fi.Name);
             num_player_skins++;
+
+            if (num_player_skins >= customizer.GetSizeOfPlayerOwned())
+                customizer.IncrementPlayerSkinOwnedSize();
         }
 
         //Check if the obstacle owned list still match the amount of skins in the folder
@@ -68,7 +74,6 @@ public class CustomizeManager : MonoBehaviour
 
         foreach (FileInfo fi in obstInfo)
         {
-            Debug.Log(fi.Name);
             num_obstacle_skins++;
         }
 
@@ -252,6 +257,10 @@ public class CustomizeManager : MonoBehaviour
         {
             BuyOrEquipText.text = "";
             BuyPanel.SetActive(true);
+            if (type == 2)
+                CostOfSkin.text = customizer.player_cost[highlighted_index].ToString();
+            else if (type == 0)
+                CostOfSkin.text = customizer.obstacle_cost[highlighted_index].ToString();
         }
     }
 
@@ -262,23 +271,31 @@ public class CustomizeManager : MonoBehaviour
             Debug.Log("Equipped");
             customizer.SetActiveSkin(highlighted_index, type);
 
-            main_menu_plaer.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + customizer.GetActiveSkin(2));
+            main_menu_plaer.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForPlayer/PlayerSkin" + customizer.GetActiveSkin(2));
             main_menu_obstacle.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForObstacles/ObstacleSkin" + customizer.GetActiveSkin(0));
             change_button();
         }
         else
         {
             int num_pc = PlayerPrefs.GetInt("Coins", 0);
-            if(num_pc > 99)
+
+            int cost = 0;
+            if (type == 2)
+                cost = customizer.player_cost[highlighted_index];
+            else if (type == 0)
+                cost = customizer.obstacle_cost[highlighted_index];
+
+            if(num_pc >= cost)
             {
                 customizer.SetSkinOwned(highlighted_index, type);
-                num_pc -= 100;
+                num_pc -= cost;
                 PlayerPrefs.SetInt("Coins", num_pc);
                 change_button();
+                GameObject.Find("NumPlayerCoinsLabel").GetComponent<Text>().text = PlayerPrefs.GetInt("Coins", 0).ToString();
             }
             else
             {
-                Debug.Log("Not enough money");
+                ui.enable_not_enough_gems();
             }
         }
 

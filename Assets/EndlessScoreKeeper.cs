@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EndlessScoreKeeper : MonoBehaviour
 {
 
-    private int score_for_endless = 0;
+    public int score_for_endless = 0;
 
     private EndlessUIController UIController;
 
@@ -34,6 +35,7 @@ public class EndlessScoreKeeper : MonoBehaviour
     //Check or set high score
     public void HighscoreCheck()
     {
+        GameObject.Find("PrevScore").GetComponent<Text>().text = score_for_endless.ToString();
         //This runs when the player dies or resets 
         if (score_for_endless > PlayerPrefs.GetInt("EndlessHighscore", 0))
         {

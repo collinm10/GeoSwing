@@ -1,81 +1,91 @@
+using UnityEngine.Events;
 using UnityEngine;
+using GoogleMobileAds.Api;
+using GoogleMobileAds.Common;
 using UnityEngine.UI;
-using UnityEngine.Advertisements;
+using System;
+using System.Collections.Generic;
 
-public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
+public class RewardedAdsButton : MonoBehaviour
 {
-    [SerializeField] Button _showAdButton;
-    [SerializeField] string _androidAdUnitId = "Rewarded_Android";
-    [SerializeField] string _iOsAdUnitId = "Rewarded_iOS";
-    private string _adUnitId;
+    private RewardedAd rewardedAd;
+    private UIController ui;
 
-    void Awake()
+    void Start()
     {
-        // Get the Ad Unit ID for the current platform:
-        _adUnitId = (Application.platform == RuntimePlatform.IPhonePlayer)
-            ? _iOsAdUnitId
-            : _androidAdUnitId;
+        ui = gameObject.GetComponent("UIController") as UIController;
+        CreateAndLoadAd();
     }
 
+    public void CreateAndLoadAd()
+    {
+        //Real AD Unit ID: ca-app-pub-5685645820979871/6198252894
+        rewardedAd = new RewardedAd("ca-app-pub-3940256099942544/1712485313");
+
+        // Called when an ad request has successfully loaded.
+        this.rewardedAd.OnAdLoaded += HandleRewardedAdLoaded;
+        // Called when an ad request failed to load.
+        this.rewardedAd.OnAdFailedToLoad += HandleRewardedAdFailedToLoad;
+        // Called when an ad is shown.
+        this.rewardedAd.OnAdOpening += HandleRewardedAdOpening;
+        // Called when an ad request failed to show.
+        this.rewardedAd.OnAdFailedToShow += HandleRewardedAdFailedToShow;
+        // Called when the user should be rewarded for interacting with the ad.
+        this.rewardedAd.OnUserEarnedReward += HandleUserEarnedReward;
+        // Called when the ad is closed.
+        this.rewardedAd.OnAdClosed += HandleRewardedAdClosed;
+
+        // Create an empty ad request.
+        AdRequest request = new AdRequest.Builder().Build();
+        // Load the rewarded ad with the request.
+        this.rewardedAd.LoadAd(request);
+    }
     // Load content to the Ad Unit:
-    public void LoadAd()
-    {
-        Debug.Log("Loading Ad: " + _adUnitId);
-        Advertisement.Load(_adUnitId, this);
-    }
-
-    // If the ad successfully loads, add a listener to the button and enable it:
-    public void OnUnityAdsAdLoaded(string adUnitId)
-    {
-        Debug.Log("Ad Loaded: " + adUnitId);
-
-        if (adUnitId.Equals(_adUnitId))
-        {
-            ShowAd();
-        }
-    }
-
-    // Implement a method to execute when the user clicks the button.
     public void ShowAd()
     {
-        // Then show the ad:
-        Advertisement.Show(_adUnitId, this);
+        this.rewardedAd.Show();
     }
 
-    // Implement the Show Listener's OnUnityAdsShowComplete callback method to determine if the user gets a reward:
-    public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
+    public void HandleRewardedAdLoaded(object sender, EventArgs args)
     {
-        if (adUnitId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
-        {
-            // Grant a reward.
-            int gems = PlayerPrefs.GetInt("coins", 0);
-            gems = gems + 1;
-            PlayerPrefs.SetInt("coins", gems);
-
-            // Load another ad:
-            Advertisement.Load(_adUnitId, this);
-        }
+        MonoBehaviour.print("HandleRewardedAdLoaded event received");
     }
 
-    // Implement Load and Show Listener error callbacks:
-    public void OnUnityAdsFailedToLoad(string adUnitId, UnityAdsLoadError error, string message)
+    public void HandleRewardedAdFailedToLoad(object sender, AdFailedToLoadEventArgs args)
     {
-        Debug.Log($"Error loading Ad Unit {adUnitId}: {error.ToString()} - {message}");
-        // Use the error details to determine whether to try to load another ad.
+        //MonoBehaviour.print("HandleRewardedAdFailedToLoad event received with message: " + args.Message);
     }
 
-    public void OnUnityAdsShowFailure(string adUnitId, UnityAdsShowError error, string message)
+    public void HandleRewardedAdOpening(object sender, EventArgs args)
     {
-        Debug.Log($"Error showing Ad Unit {adUnitId}: {error.ToString()} - {message}");
-        // Use the error details to determine whether to try to load another ad.
+        MonoBehaviour.print("HandleRewardedAdOpening event received");
     }
 
-    public void OnUnityAdsShowStart(string adUnitId) { }
-    public void OnUnityAdsShowClick(string adUnitId) { }
-
-    void OnDestroy()
+    public void HandleRewardedAdFailedToShow(object sender, AdErrorEventArgs args)
     {
-        // Clean up the button listeners:
-        _showAdButton.onClick.RemoveAllListeners();
+        MonoBehaviour.print(
+            "HandleRewardedAdFailedToShow event received with message: "
+                             + args.Message);
     }
+
+    public void HandleRewardedAdClosed(object sender, EventArgs args)
+    {
+        CreateAndLoadAd();
+        MonoBehaviour.print("HandleRewardedAdClosed event received");
+    }
+
+    public void HandleUserEarnedReward(object sender, Reward args)
+    {
+        string type = args.Type;
+        double amount = args.Amount;
+        int coin = PlayerPrefs.GetInt("Coins", 0);
+        coin += 1;
+        PlayerPrefs.SetInt("Coins", coin);
+        MonoBehaviour.print(
+            "HandleRewardedAdRewarded event received for "
+                        + amount.ToString() + " " + type);
+        ui.disable_buy_level();
+        ui.disable_not_enough_gems();
+    }
+
 }
