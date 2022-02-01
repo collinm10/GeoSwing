@@ -2419,7 +2419,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: how far is too far
+  m_Text: 'my score as of publish day: 98'
 --- !u!222 &2050674695
 CanvasRenderer:
   m_ObjectHideFlags: 0

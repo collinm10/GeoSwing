@@ -27,5 +27,29 @@ public class LevelProgress
     {
         levelUnlockProg[i] = true;
     }
-
+    
+    public void UpdateLevelAmount()
+    {
+        bool[] temp = new bool[levelUnlockProg.Length + 10];
+        
+        for(int i = 0; i < temp.Length; i++)
+        {
+            if(i < levelUnlockProg.Length)
+            {
+                temp[i] = levelUnlockProg[i];
+            }
+            else
+            {
+                if(i < 11)
+                {
+                    temp[i] = true;
+                }
+                else
+                {
+                    temp[i] = false;
+                }
+            }
+        }
+        levelUnlockProg = temp;
+    }
 }

@@ -7,7 +7,7 @@ public class StartUIManager : MonoBehaviour
 {
     private int CurrentLevel;
 
-    private float[] level_times_to_beat = { 3.5f, 6f, 13f, 10f, 14f, 18f, 19f, 19f, 30f, 27f };
+    private float[] level_times_to_beat = { 3.5f, 6f, 13f, 10f, 14f, 18f, 23f, 19f, 30f, 27f, 14f, 10f, 25f, 13f, 25f, 0f, 0f, 0f, 0f, 0f };
 
     // Start is called before the first frame update
     void Start()

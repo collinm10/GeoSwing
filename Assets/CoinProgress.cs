@@ -10,7 +10,7 @@ public class CoinProgress
     public CoinProgress()
     {
         int i = 0;
-        for(i = 0; i < 10; i++)
+        for(i = 0; i < 20; i++)
         {
             levelCoinProg[i] = new bool[3];
         }
@@ -27,14 +27,19 @@ public class CoinProgress
         catch{return false;}
     }
     
-    public void AddNewLevel()
+    public void AddNewLevelSet()
     {
-        bool[][] b = new bool[levelCoinProg.Length + 1][];
+        bool[][] b = new bool[levelCoinProg.Length + 10][];
         for (int i = 0; i < levelCoinProg.Length; i++)
         {
             b[i] = levelCoinProg[i];
         }
-        b[levelCoinProg.Length] = new bool[3];
+        
+        for(int i = 0; i < 10; i++)
+        {
+            b[levelCoinProg.Length + i] = new bool[3];
+        }
+
         levelCoinProg = b;
     }
 }

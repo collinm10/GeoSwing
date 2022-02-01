@@ -54,6 +54,11 @@ public class PlayerMovement : MonoBehaviour
 
     private GameObject spriteRendererGO;
 
+    private int num_phasors = 0;
+    public float phasor_force;
+
+    public GameObject phasor_prefab;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -199,6 +204,31 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
+    void LateUpdate()
+    {
+        //If not currently grappling
+        if (Input.touchCount > 0)
+        {
+            if (!draw_line && num_phasors > 0 && launched && playerRB.gravityScale != 0f)
+            {
+                Touch phasor_touch = Input.GetTouch(0);
+                if (phasor_touch.phase == TouchPhase.Began)
+                {
+                    Vector3 g_pos = Camera.main.ScreenToWorldPoint(phasor_touch.position);
+                    Vector3 player_pos = player.transform.position;
+                    Vector2 dir = (player_pos - g_pos);
+                    dir.Normalize();
+                    playerRB.AddForce(phasor_force * dir);
+                    num_phasors--;
+
+                    //Instantiate phasor graphic
+                    GameObject hold_me = Instantiate(phasor_prefab, transform.position, Quaternion.identity);
+                    hold_me.GetComponent<MovePhasor>().ChangeDir(dir, g_pos);
+                }
+            }
+        }
+    }
+
     void OnCollisionEnter2D(Collision2D col)
     {
         if (col.gameObject.tag == "Finish")
@@ -241,6 +271,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void reset()
     {
+        num_phasors = 0;
         grappled_to = null;
         draw_line = false;
         Destroy(joint);
@@ -268,6 +299,11 @@ public class PlayerMovement : MonoBehaviour
         bb1.SetActive(true);
         boost = 100;
         bb.boost = 100;
+    }
+
+    public void AddPhasor()
+    {
+        num_phasors += 3;
     }
 
     private void setup_grapple(Touch t)

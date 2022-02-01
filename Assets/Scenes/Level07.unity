@@ -10221,7 +10221,7 @@ MonoBehaviour:
   comment_label: {fileID: 168552159}
   time_difference: {fileID: 168552158}
   CurrentLevel: 7
-  gem_win_threshold: 19
+  gem_win_threshold: 23
 --- !u!114 &1102536716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24190,7 +24190,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: under 19? there's no way
+  m_Text: under 23? there's no way
 --- !u!222 &1985509727
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -25440,7 +25440,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 9.99
+  m_Text: 23
 --- !u!222 &2122388649
 CanvasRenderer:
   m_ObjectHideFlags: 0

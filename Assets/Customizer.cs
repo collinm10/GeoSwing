@@ -15,6 +15,9 @@ public class Customizer
     public int active_player_skin_index;
     public int active_obstacle_skin_index;
 
+    public int num_player_skins = 24;
+    public int num_obstacle_skins = 4;
+
     public Customizer()
     {
         //Define the costs for skins
@@ -30,25 +33,19 @@ public class Customizer
         obstacle_skin_owned = new List<bool>();
 
         //Add all bools for each player skin in each folder
-        DirectoryInfo playerDir = new DirectoryInfo("Assets/Resources/ForPlayer");
-        FileInfo[] playerInfo = playerDir.GetFiles("*.png");
-        
-        foreach(FileInfo fi in playerInfo)
+        for(int i = 0; i < num_player_skins; i++)
         {
             player_skin_owned.Add(false);
         }
         
         //Add all bools for each obstacle skin in each folder
-        DirectoryInfo obstDir = new DirectoryInfo("Assets/Resources/ForObstacles");
-        FileInfo[] obstInfo = obstDir.GetFiles("*.png");
-        
-        foreach(FileInfo fi in obstInfo)
+        for (int i = 0; i < num_obstacle_skins; i++)
         {
             obstacle_skin_owned.Add(false);
         }
 
-        
-        if(player_skin_owned.Count > 0)
+
+        if (player_skin_owned.Count > 0)
             player_skin_owned[0] = true;
 
         if(obstacle_skin_owned.Count > 0)
@@ -107,9 +104,10 @@ public class Customizer
         }
     }
 
-    public void IncrementPlayerSkinOwnedSize()
+    public void IncrementPlayerSkinOwnedSize(int x)
     {
-        player_skin_owned.Add(false);
+        for(int i = 0; i < x; i++)
+            player_skin_owned.Add(false);
     }
 
     public void IncrementObstacleSkinOwnedSize()

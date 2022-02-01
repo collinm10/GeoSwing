@@ -42,9 +42,15 @@ public class CustomizeManager : MonoBehaviour
 
     void Awake()
     {
+        /*
+         REMEMBER AFTER ADDING SKINS
+         a) Change num skins here
+         b) Change num skins in customizer
+         c) Make sure skins have appropriate numbering
+        */
         //Initialize some variables
-        num_obstacle_skins = 0;
-        num_player_skins = 0;
+        num_obstacle_skins = 4;
+        num_player_skins = 24;
 
         ui = gameObject.GetComponent("UIController") as UIController;
 
@@ -57,25 +63,8 @@ public class CustomizeManager : MonoBehaviour
         }
 
         //Check if the player owned list still match the amount of skins in the folder
-        DirectoryInfo playerDir = new DirectoryInfo("Assets/Resources/ForPlayer");
-        FileInfo[] playerInfo = playerDir.GetFiles("*.png");
-
-        foreach (FileInfo fi in playerInfo)
-        {
-            num_player_skins++;
-
-            if (num_player_skins >= customizer.GetSizeOfPlayerOwned())
-                customizer.IncrementPlayerSkinOwnedSize();
-        }
-
-        //Check if the obstacle owned list still match the amount of skins in the folder
-        DirectoryInfo obstDir = new DirectoryInfo("Assets/Resources/ForObstacles");
-        FileInfo[] obstInfo = obstDir.GetFiles("*.png");
-
-        foreach (FileInfo fi in obstInfo)
-        {
-            num_obstacle_skins++;
-        }
+        if (num_player_skins >= customizer.GetSizeOfPlayerOwned())
+            customizer.IncrementPlayerSkinOwnedSize(num_player_skins - customizer.GetSizeOfPlayerOwned());
 
         main_menu_plaer.GetComponent<MainMenuAnimation>().update_skins(customizer.GetActiveSkin(2), 2);
         main_menu_obstacle.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("ForObstacles/ObstacleSkin" + customizer.GetActiveSkin(0));
@@ -304,7 +293,6 @@ public class CustomizeManager : MonoBehaviour
 
     public void reset_customizer()
     {
-        Customizer custom = new Customizer();
-        SaveSystem.SaveCustomizer(custom);
+        PlayerPrefs.SetInt("Coins", 0);
     }
 }

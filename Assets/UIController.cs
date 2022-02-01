@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using PlayFab;
+using PlayFab.ClientModels;
 
 public class UIController : MonoBehaviour
 {
-    [SerializeField] private string[] scene_names;
+    public GameObject canvas;
+    public string[] scene_names;
     [SerializeField] private GameObject MainMenuCanvas;
     [SerializeField] private GameObject LevelCanvas;
     [SerializeField] private GameObject level_button_prefab;
@@ -18,6 +21,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject BuyLevelPanel;
     [SerializeField] private GameObject NotEnoughGemsPanel;
     [SerializeField] private GameObject IAPPanel;
+    [SerializeField] private GameObject LeaderboardPanel;
 
     private GameObject[] level_buttons;
     public Sprite CoinPrefab;
@@ -27,15 +31,47 @@ public class UIController : MonoBehaviour
     private GameObject TimeToBeat;
     private int currLevel;
 
-    private float[] level_times_to_beat = {3.5f, 6f, 13f, 10f, 14f, 18f, 23f, 19f, 30f, 27f};
+    private int currLevelScreen = 1;
+
+    private float[] level_times_to_beat = {3.5f, 6f, 13f, 10f, 14f, 18f, 23f, 19f, 30f, 27f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f};
+
+    private List<GameObject> LevelScreens = new List<GameObject>();
+
+    private GameObject NextLevelScreenButton;
+    private GameObject PrevLevelScreenButton;
 
     void Awake()
     {
         LevelProgress lp = SaveSystem.LoadLevelUnlockProg();
+        
+        //If the player has never opened the app
         if(lp == null)
         {
-            lp = new LevelProgress(10);
+            lp = new LevelProgress(scene_names.Length);
             SaveSystem.SaveLevelProgress(lp);
+        }
+
+        //If the number of levels has updated
+        /*
+         
+         Check coin progress
+         Check level progress
+        
+         
+         */
+        if(lp.levelUnlockProg.Length < scene_names.Length)
+        {
+            lp.UpdateLevelAmount();
+            SaveSystem.SaveLevelProgress(lp);
+        }
+
+        CoinProgress cp1 = SaveSystem.LoadCoinProgress();
+        if (cp1 == null)
+            Debug.Log("Ignore");
+        else if(cp1.levelCoinProg.Length < scene_names.Length)
+        {
+            cp1.AddNewLevelSet();
+            SaveSystem.SaveCoinProgress(cp1);
         }
 
         level_buttons = new GameObject[scene_names.Length];
@@ -45,6 +81,15 @@ public class UIController : MonoBehaviour
     {
         customize_level_buttons();
         SetLevelUnlocks();
+        //LevelCanvas.GetComponent<RectTransform>().sizeDelta = new Vector2(canvas.GetComponent<RectTransform>().rect.width, LevelCanvas.GetComponent<RectTransform>().rect.height);
+        LevelScreens.Add(GameObject.Find("LevelScreen1"));
+        LevelScreens.Add(GameObject.Find("LevelScreen2"));
+
+        NextLevelScreenButton = GameObject.Find("NextLevelScreen");
+        PrevLevelScreenButton = GameObject.Find("PrevLevelScreen");
+
+        PrevLevelScreenButton.SetActive(false);
+        LevelScreens[1].SetActive(false);
         LevelCanvas.SetActive(false);
 
     }
@@ -74,6 +119,7 @@ public class UIController : MonoBehaviour
         disable_buy_level();
         disable_iap_panel();
         disable_not_enough_gems();
+        LeaderboardPanel.SetActive(false);
     }
 
     public void open_main_menu()
@@ -140,6 +186,31 @@ public class UIController : MonoBehaviour
         }
     }
 
+    public void PrevLevelScreen()
+    {
+        LevelScreens[currLevelScreen - 1].SetActive(false);
+        LevelScreens[currLevelScreen - 2].SetActive(true);
+        currLevelScreen--;
+
+        if (currLevelScreen == 1)
+            PrevLevelScreenButton.SetActive(false);
+
+        NextLevelScreenButton.SetActive(true);
+    }
+
+    public void NextLevelScreen()
+    {
+        LevelScreens[currLevelScreen - 1].SetActive(false);
+        LevelScreens[currLevelScreen].SetActive(true);
+        currLevelScreen++;
+
+        if (currLevelScreen == LevelScreens.Count)
+            NextLevelScreenButton.SetActive(false);
+
+        PrevLevelScreenButton.SetActive(true);
+
+    }
+
     private void enable_main_canvas()
     {
         MainMenuCanvas.SetActive(true);
@@ -168,7 +239,7 @@ public class UIController : MonoBehaviour
         try { GameObject.Find("NumPlayerCoinsLabel").GetComponent<Text>().text = PlayerPrefs.GetInt("Coins", 0).ToString(); }
         catch { }
     }
-    private void disable_main_canvas()
+    public void disable_main_canvas()
     {
         MainMenuCanvas.SetActive(false);
     }
@@ -178,7 +249,7 @@ public class UIController : MonoBehaviour
         level_info_panel.SetActive(true);
     }
 
-    private void disable_level_info_panel()
+    public void disable_level_info_panel()
     {
         level_info_panel.SetActive(false);
     }
@@ -281,7 +352,7 @@ public class UIController : MonoBehaviour
             SaveSystem.SaveCoinProgress(cp);
         }
 
-        for(int i = 0; i < scene_names.Length; i++)
+        for(int i = 0; i < 15; i++)
         {
             int jj = 0;
             for(int j = 0; j < 3; j++)
@@ -401,5 +472,10 @@ public class UIController : MonoBehaviour
         if (IAPPanel == null)
             IAPPanel = GameObject.Find("IAP Panel");
         IAPPanel.SetActive(false);
+    }
+
+    public void LoadLeaderboard()
+    {
+        gameObject.GetComponent<LeaderboardController>().OnLeaderboardClick(currLevel);
     }
 }

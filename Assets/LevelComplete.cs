@@ -32,10 +32,13 @@ public class LevelComplete : MonoBehaviour
     private GameObject BuyLevelPanel;
     private GameObject NotEnoughGemsPanel;
 
+    private GameObject swing_button;
+
     private int adCounter = 0;
 
     void Start()
     {
+        swing_button = GameObject.Find("Grapple");
         CanvasAtEnd = GameObject.Find("CanvasAtEnd");
         CanvasAtEnd.SetActive(false);
 
@@ -65,6 +68,8 @@ public class LevelComplete : MonoBehaviour
 
     public void level_complete()
     {
+        //Disable swing button
+        swing_button.SetActive(false);
         //Freeze player 
         player.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
         player.GetComponent<Rigidbody2D>().gravityScale = 0f;
@@ -90,7 +95,7 @@ public class LevelComplete : MonoBehaviour
         {
             PlayerPrefs.SetFloat(level_key, time_completed);
             highscore.text = time_completed.ToString("0.00");
-            GameObject.Find("StartGemTime").GetComponent<Text>().text = time_completed.ToString("0.00");
+            GameObject.Find("StartBestTime").GetComponent<Text>().text = time_completed.ToString("0.00");
             comment_label.text = beat_best[Random.Range(0, beat_best.Length)];
 
             if (bestrun != 1000f)
@@ -99,6 +104,9 @@ public class LevelComplete : MonoBehaviour
                 time_difference.text = time_completed.ToString("0.00");
 
             time_difference.color = new Color(0, 1, 0, 1);
+
+            //Set to update leaderboard
+            PlayerPrefs.SetInt("Level" + CurrentLevel.ToString() + "Update", 1);
         }
         else
         {
@@ -138,6 +146,8 @@ public class LevelComplete : MonoBehaviour
 
     public void level_failed()
     {
+        swing_button.SetActive(true);
+
         adCounter = PlayerPrefs.GetInt("Ad Counter", 0);
 
         if (++adCounter >= 25)
@@ -183,6 +193,10 @@ public class LevelComplete : MonoBehaviour
         if(lp.levelUnlockProg[CurrentLevel])
         {
             string next_level_name = "Level0" + (CurrentLevel + 1).ToString();
+            if(CurrentLevel > 9)
+            {
+                next_level_name = "Level" + (CurrentLevel + 1).ToString();
+            }
             SceneManager.LoadScene(next_level_name);
         }
         else

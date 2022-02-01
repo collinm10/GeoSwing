@@ -141,7 +141,7 @@ public class HazardGeneration : MonoBehaviour
 
                 //Maybe add gem?
 
-                int maybe = Random.Range(0, 10);
+                int maybe = Random.Range(0, 15);
                 if(maybe == 1)
                 {
                    Instantiate(GemPrefab, new Vector3(player.transform.position.x + HazardGenerationOffset, pos, 5), Quaternion.identity);
