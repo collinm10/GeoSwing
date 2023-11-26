@@ -111,25 +111,40 @@ public class LeaderboardController : MonoBehaviour
 
     public void GetLeaderboard(int level)
     {
-        var request = new GetLeaderboardRequest
+        /*var request = new GetLeaderboardRequest
         {
             StatisticName = "Level " + level.ToString() + " Time",
             StartPosition = 0,
             MaxResultsCount = 10
         };
-        PlayFabClientAPI.GetLeaderboard(request, OnLeaderboardGet, OnError);
+        PlayFabClientAPI.GetLeaderboard(request, OnLeaderboardGet, OnError);*/
+
+        var request = new GetLeaderboardAroundPlayerRequest
+        {
+            StatisticName = "Level " + level.ToString() + " Time",
+            PlayFabId = "B608539395D97582",
+            MaxResultsCount = 11
+        };
+        PlayFabClientAPI.GetLeaderboardAroundPlayer(request, OnLeaderboardGet, OnError);
     }
 
-    void OnLeaderboardGet(GetLeaderboardResult result)
+    void OnLeaderboardGet(GetLeaderboardAroundPlayerResult result)
     {
         Debug.Log("Leaderboard has been got");
 
         //Do something
         int count = 1;
+        bool skip = true;
         var items = result.Leaderboard;
         items.Reverse();
         foreach (var item in items)
         {
+            if (skip)
+            {
+                skip = false;
+                continue;
+            }
+
             //If player hasn't completed level
             if(item.StatValue/100 != 1000)
             {
@@ -188,5 +203,14 @@ public class LeaderboardController : MonoBehaviour
     {
         ui.open_main_menu();
         DisplayNamePanel.SetActive(false);
+    }
+
+    int hold_curr_leaderboard = 1;
+
+    public void CreateDummy() 
+    {
+        SendLeaderboard(0, hold_curr_leaderboard);
+        hold_curr_leaderboard++;
+        Debug.Log(hold_curr_leaderboard);
     }
 }

@@ -12546,7 +12546,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -12577,9 +12577,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1058718791}
-        m_TargetAssemblyTypeName: CustomizeManager, Assembly-CSharp
-        m_MethodName: reset_customizer
+      - m_Target: {fileID: 1058718794}
+        m_TargetAssemblyTypeName: LeaderboardController, Assembly-CSharp
+        m_MethodName: CreateDummy
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

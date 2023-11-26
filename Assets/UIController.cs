@@ -33,7 +33,7 @@ public class UIController : MonoBehaviour
 
     private int currLevelScreen = 1;
 
-    private float[] level_times_to_beat = {3.5f, 6f, 13f, 10f, 14f, 18f, 23f, 19f, 30f, 27f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f};
+    private float[] level_times_to_beat = {3.5f, 6f, 13f, 10f, 14f, 18f, 23f, 19f, 30f, 27f, 14, 10f, 25f, 13f, 25f, 0f, 0f, 0f, 0f, 0f};
 
     private List<GameObject> LevelScreens = new List<GameObject>();
 
